@@ -1,7 +1,7 @@
 # Discord at Scale — Sharding Simulation Lab 🏏
 
-> **Assignment:** Engineering distributed systems under extreme load.  
-> **Scenario:** A cricket final. 50,000 users. One channel. Thousands of messages per second.
+> **Assignment:** Engineering Distributed Systems Under Extreme Load
+> **Scenario:** A live cricket final with **50,000 users**, one active channel, and **thousands of messages per second**.
 
 ---
 
@@ -10,37 +10,37 @@
 ```
 Discord/
 │
-├── index.html                  ← Interactive simulation dashboard (open in browser)
-├── styles.css                  ← Dark-mode design system
-├── simulation.js               ← Full simulation engine (all strategies)
+├── index.html                  ← Interactive Simulation Dashboard (Open in Browser)
+├── styles.css                  ← Dark-mode Design System
+├── simulation.js               ← Core Simulation Engine (All Strategies)
 │
-├── day1_2_analysis.py          ← Written analysis: where does the system break?
-├── day3_4_naive_server.py      ← Single-server implementation + load simulation
-├── day5_shards.py              ← Base Shard + ShardManager classes
-├── day6_user_sharding.py       ← User-based sharding + influencer spike
-├── day7_channel_sharding.py    ← Channel-based sharding + viral event
-├── day8_hash_sharding.py       ← Hash-based sharding + resharding demo
-├── day9_stress_simulation.py   ← Full stress test: 3 scenarios × 4 strategies
-└── day10_final_analysis.py     ← Final answers to all 4 mandatory questions
+├── day1_2_analysis.py          ← System Breakdown Analysis
+├── day3_4_naive_server.py      ← Single-Server Model + Load Simulation
+├── day5_shards.py              ← Base Shard + ShardManager Architecture
+├── day6_user_sharding.py       ← User-Based Sharding + Influencer Spike
+├── day7_channel_sharding.py    ← Channel-Based Sharding + Viral Event
+├── day8_hash_sharding.py       ← Hash-Based Sharding + Resharding Demo
+├── day9_stress_simulation.py   ← Full Stress Test (3 Scenarios × 4 Strategies)
+└── day10_final_analysis.py     ← Final Engineering Conclusions
 ```
 
 ---
 
 ## 🚀 Running the Dashboard
 
-Simply open `index.html` in any browser:
+Open the simulation dashboard directly in your browser:
 
 ```bash
 open index.html
 ```
 
-The dashboard has 8 interactive tabs covering every day of the assignment.
+The dashboard contains **8 interactive tabs**, each representing a phase of the distributed systems experiment.
 
 ---
 
 ## 🐍 Running the Python Simulations
 
-Each file is standalone and runs directly:
+Each module runs independently:
 
 ```bash
 # Day 1–2: System analysis
@@ -49,19 +49,19 @@ python3 day1_2_analysis.py
 # Day 3–4: Naive server load simulation
 python3 day3_4_naive_server.py
 
-# Day 6: Influencer spike (user-based sharding)
+# Day 6: Influencer spike (User-based sharding)
 python3 day6_user_sharding.py
 
-# Day 7: Viral channel (channel-based sharding)
+# Day 7: Viral channel simulation (Channel sharding)
 python3 day7_channel_sharding.py
 
-# Day 8: Hash sharding + resharding problem
+# Day 8: Hash sharding + resharding challenge
 python3 day8_hash_sharding.py
 
-# Day 9: Full stress test (all scenarios × all strategies)
+# Day 9: Full stress testing
 python3 day9_stress_simulation.py
 
-# Day 10: Final analysis — all 4 questions answered
+# Day 10: Final engineering analysis
 python3 day10_final_analysis.py
 ```
 
@@ -69,36 +69,60 @@ python3 day10_final_analysis.py
 
 ## 📅 Day-by-Day Summary
 
-| Day | Focus | Key Insight |
-|-----|-------|-------------|
-| 1–2 | System Thinking | Memory → CPU → Network → Hotspot (in that order) |
-| 3–4 | Naive Server | Works for 10 users, collapses at 10,000 |
-| 5 | Shard Intro | Without routing logic, shards are useless |
-| 6 | User Sharding ❌ | One influencer → one shard → overloaded |
-| 7 | Channel Sharding ❌ | One viral event → one shard → overloaded |
-| 8 | Hash Sharding ⚠️ | Better distribution, but resharding breaks everything |
-| 9 | Stress Test | Normal looks fine, viral event reveals true failure |
-| 10 | Final Analysis | All 4 questions, resharding math, shard failure impact |
+| Day | Focus              | Key Insight                                                     |
+| --- | ------------------ | --------------------------------------------------------------- |
+| 1–2 | System Thinking    | Failures appear in order: **Memory → CPU → Network → Hotspots** |
+| 3–4 | Naive Server       | Works at small scale, collapses near 10K users                  |
+| 5   | Shard Architecture | Shards without routing logic provide zero benefit               |
+| 6   | User Sharding ❌    | Influencer traffic overloads a single shard                     |
+| 7   | Channel Sharding ❌ | Viral events create shard hotspots                              |
+| 8   | Hash Sharding ⚠️   | Balanced distribution but resharding becomes costly             |
+| 9   | Stress Testing     | Normal traffic hides real failure modes                         |
+| 10  | Final Analysis     | Shard failures, migration math, and resilience conclusions      |
 
 ---
 
 ## 🧠 Core Findings
 
 ### Q1 — Which shard fails first?
-- **User sharding:** Shard 0 — influencer (user_id=0) always routes there
-- **Channel sharding:** Shard 1 — #cricket-live (channel_id=1 → 1%3=1)
 
-### Q2 — Which strategy looks good but fails under spike?
-`Hash(channel_id)` — perfectly balanced on a normal day.  
-During a cricket final: **85% of traffic → one hash → one shard → 💥**
+* **User Sharding:** `Shard 0` fails first
+  → Influencer (`user_id = 0`) always routes here.
 
-### Q3 — What happens when shards go from 3 → 10?
-**85% of all keys remap to different shards.** For 1 billion messages,  
-that's 850M records needing migration. Fix: **consistent hashing**.
+* **Channel Sharding:** `Shard 1` fails first
+  → `#cricket-live` (`channel_id = 1 → 1 % 3 = 1`).
 
-### Q4 — What breaks when one shard goes offline?
-33% of data is permanently lost (no replica). Remaining 2 shards  
-absorb 150% load → cascade failure risk. Fix: **replication factor ≥ 3**.
+---
+
+### Q2 — Which strategy looks good but fails during spikes?
+
+`hash(channel_id)` appears perfectly balanced under normal traffic.
+
+During a cricket final:
+**≈ 85% of traffic hashes to one shard → overload → system failure 💥**
+
+---
+
+### Q3 — What happens when shards scale from 3 → 10?
+
+Approximately **85% of keys remap**.
+
+Example:
+
+* 1 Billion stored messages
+* **850 Million records require migration**
+
+✅ Solution: **Consistent Hashing**
+
+---
+
+### Q4 — What breaks if one shard goes offline?
+
+* **33% data loss** (no replication)
+* Remaining shards absorb **150% additional load**
+* High risk of cascading failure
+
+✅ Solution: **Replication Factor ≥ 3**
 
 ---
 
@@ -113,15 +137,18 @@ def fetch_channel_messages(manager, channel_id, limit=10):
         channel_msgs = shard.get_by_channel(channel_id)
         results.extend(channel_msgs)
     results.sort(key=lambda m: m.timestamp)
-    return results[-limit:]   # Last N messages
+    return results[-limit:]   # Return latest N messages
 ```
 
-**Cost:** O(num_shards × messages_per_shard) — scales with shard count.  
-With `hash(channel_id)` → query 1 shard. With `hash(message_id)` → query all shards.
+**Query Cost:**
+`O(number_of_shards × messages_per_shard)`
+
+* `hash(channel_id)` → query **1 shard**
+* `hash(message_id)` → query **all shards**
 
 ---
 
-## 🌡 Hotspot Detection
+## 🌡 Hotspot Detection Logic
 
 ```python
 def hotspot_check(self):
@@ -129,22 +156,31 @@ def hotspot_check(self):
     for shard in self.shards:
         pct = len(shard.messages) / total * 100
         if pct > 50:
-            print(f"⚠️ [HOTSPOT] Shard {shard.id}: {pct:.1f}% — rebalancing needed!")
+            print(f"⚠️ [HOTSPOT] Shard {shard.id}: {pct:.1f}% — Rebalancing Needed!")
 ```
+
+Purpose:
+
+* Detect uneven load distribution
+* Trigger automated rebalancing decisions
 
 ---
 
-## 🏆 Real-World Answer (Discord)
+## 🏆 Real-World Reference — Discord Architecture
 
-Discord uses **Cassandra** for message storage, partitioned by:
+Discord stores messages using **Apache Cassandra**, partitioned by:
+
 ```
 partition_key = (channel_id, bucket)
 bucket = floor(message_timestamp / EPOCH_DURATION)
 ```
-- Hot channels get a new bucket **every hour**, distributing writes naturally
-- Read replicas serve popular channels during events
-- "Super Sharding" for guilds > 250,000 members
+
+### Key Engineering Ideas
+
+* Hot channels receive a **new bucket every hour**, distributing writes
+* Read replicas handle viral traffic spikes
+* **Super-Sharding** is applied for guilds exceeding 250,000 members
 
 ---
 
-*Built as part of a distributed systems assignment — simulating real failure modes, not idealized solutions.*
+*Built as part of a Distributed Systems assignment — focused on real failure modes, scalability limits, and production-grade engineering thinking rather than idealized designs.*
